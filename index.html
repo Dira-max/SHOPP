@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIRA ONLINE SHOP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* === KODE CSS DIMULAI DI SINI === */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary-color: #6a11cb;
+            --secondary-color: #2575fc;
+            --text-color: #f0f0f0;
+            --bg-color: #121212;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 0;
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+            top: 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .cart-icon:hover {
+            transform: scale(1.1);
+        }
+
+        #cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        main {
+            padding-top: 100px; /* space for fixed header */
+        }
+
+        section {
+            padding: 4rem 0;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(0deg);
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .product-card:hover::before {
+            transform: rotate(180deg);
+        }
+
+
+        .product-card h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.4rem;
+        }
+
+        .price {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .add-to-cart-btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .add-to-cart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(37, 117, 252, 0.4);
+        }
+
+        /* Shopping Cart */
+        .cart-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        #cart-items {
+            margin-bottom: 1rem;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-info {
+            flex-grow: 1;
+        }
+
+        .item-info span {
+            display: block;
+        }
+
+        .item-quantity {
+            display: flex;
+            align-items: center;
+        }
+
+        .quantity-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            margin: 0 0.5rem;
+        }
+
+        .remove-item-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+
+        .cart-summary {
+            text-align: right;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Payment & Checkout */
+        .payment-section, .upload-section, .checkout-buttons {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .payment-method {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .payment-method span:first-child {
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .qris-img {
+            width: 100px;
+            height: 100px;
+            cursor: zoom-in;
+            transition: transform 0.3s ease;
+        }
+        .qris-img:hover {
+            transform: scale(1.1);
+        }
+
+        #proof-upload {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px dashed var(--border-color);
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        #proof-upload::-webkit-file-upload-button {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .checkout-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        #checkout-whatsapp, #checkout-telegram {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #checkout-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+        #checkout-whatsapp:hover {
+            background: #128C7E;
+            box-shadow: 0 5px 15px #25D36644;
+        }
+
+        #checkout-telegram {
+            background: #0088cc;
+            color: white;
+        }
+        #checkout-telegram:hover {
+            background: #0077b5;
+            box-shadow: 0 5px 15px #0088cc44;
+        }
+
+        /* Modal QRIS */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.9);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 80%;
+            max-height: 80%;
+            animation: zoomIn 0.3s ease;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 25px;
+            right: 45px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        /* Add to Cart Animation */
+        .product-card-clone {
+            position: fixed;
+            z-index: 110;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            transition: all 1s ease-in-out;
+        }
+        /* === KODE CSS SELESAI === */
+    </style>
+</head>
+<body>
+    <canvas id="background-canvas"></canvas>
+
+    <header>
+        <div class="container">
+            <h1>DIRA ONLINE SHOP</h1>
+            <div class="cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="products">
+            <h2>Produk Kami</h2>
+            <div class="product-grid">
+                <div class="product-card" data-id="1" data-name="JASA BUAT WEBSITE TOP UP ALL GAME" data-price="25000">
+                    <h3>JASA BUAT WEBSITE TOP UP ALL GAME</h3>
+                    <p class="price">Rp 25.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                <div class="product-card" data-id="2" data-name="JASA BUAT WEBSITE TOKO ONLINE" data-price="20000">
+                    <h3>JASA BUAT WEBSITE TOKO ONLINE</h3>
+                    <p class="price">Rp 20.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                <div class="product-card" data-id="3" data-name="JASA BUAT WEBSITE KHUSUS PEMBAYARAN" data-price="20000">
+                    <h3>JASA BUAT WEBSITE KHUSUS PEMBAYARAN</h3>
+                    <p class="price">Rp 20.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="4" data-name="SOURCE CODE TOP UP ALL GAME" data-price="20000">
+                    <h3>SOURCE CODE TOP UP ALL GAME</h3>
+                    <p class="price">Rp 20.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="5" data-name="SOURCE CODE TOKO ONLINE" data-price="15000">
+                    <h3>SOURCE CODE TOKO ONLINE</h3>
+                    <p class="price">Rp 15.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="6" data-name="SOURCE CODE KHUSUS PEMBAYARAN" data-price="15000">
+                    <h3>SOURCE CODE KHUSUS PEMBAYARAN</h3>
+                    <p class="price">Rp 15.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="7" data-name="MURID BUAT WEBSITE" data-price="15000">
+                    <h3>MURID BUAT WEBSITE</h3>
+                    <p class="price">Rp 15.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                    </div>
+                 <div class="product-card" data-id="8" data-name="OWNER MURID BUAT WEBSITE" data-price="25000">
+                    <h3>OWNER MURDI BUAT WEBSITE</h3>
+                    <p class="price">Rp 25.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                    </div>
+                 <div class="product-card" data-id="9" data-name="MURID SUNTIK ALL SOSMED" data-price="10000">
+                    <h3>MURID SUNTIK ALL SOSMED</h3>
+                    <p class="price">Rp 10.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                    </div>
+                 <div class="product-card" data-id="10" data-name="MURID BUG WA" data-price="15000">
+                    <h3>MURID BUG WA</h3>
+                    <p class="price">Rp 15.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                    </div>
+                 <div class="product-card" data-id="11" data-name="OWNER MURID BUG WA" data-price="25000">
+                    <h3>OWNER MURID BUG WA</h3>
+                    <p class="price">Rp 25.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                    </div>
+                 <div class="product-card" data-id="12" data-name="SC BUG WA VIA TELE" data-price="30000">
+                    <h3>SC BUG WA VIA TELE</h3>
+                    <p class="price">Rp 30.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="13" data-name="SC PANEL PRIVATE" data-price="25000">
+                    <h3>SC PANEL PRIVATE</h3>
+                    <p class="price">Rp 25.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="14" data-name="MURID PANEL PRIVATE" data-price="10000">
+                    <h3>MURID PANEL PRIVATE</h3>
+                    <p class="price">Rp 10.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="15" data-name="ADMIN PANEL PRIVATE" data-price="15000">
+                    <h3>ADMIN PANEL PRIVATE</h3>
+                    <p class="price">Rp 15.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="16" data-name="LIST PANEL PRIVATE KE WA ATAU TELE AJA" data-price="0">
+                    <h3>LIST PANEL PRIVATE KE WA ATAU TELE AJA</h3>
+                    <p class="price">Rp 0</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="17" data-name="LIST SUNTIK SOSMED KE WA ATAU TELE AJA" data-price="0">
+                    <h3>LIST SUNTIK SOSMED KE WA ATAU TELE AJA</h3>
+                    <p class="price">Rp 0</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="18" data-name="LIST BUG WA KE WA ATAU TELE AJA" data-price="0">
+                    <h3>LIST BUG WA KE WA ATAU TELE AJA</h3>
+                    <p class="price">Rp 0</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="19" data-name="APK NONTON TV" data-price="2000">
+                    <h3>APK NONTON TV</h3>
+                    <p class="price">Rp 2.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="20" data-name="APK NONTON BIOSKOP" data-price="2000">
+                    <h3>APK NONTON BIOSKOP</h3>
+                    <p class="price">Rp 2.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="21" data-name="APK BUAT HD FOTO/VIDEO" data-price="2000">
+                    <h3>APK BUAT HD FOTO/VIDEO</h3>
+                    <p class="price">Rp 2.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="22" data-name="APK AUTO SV CONTACT" data-price="3000">
+                    <h3>APK AUTO SV CONTACT</h3>
+                    <p class="price">Rp 3.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="23" data-name="FITUR ROG" data-price="3000">
+                    <h3>FITUR ROG</h3>
+                    <p class="price">Rp 3.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+                 <div class="product-card" data-id="19" data-name="HOLO FF MAX SENJATA ONLY SS 00 AMAN" data-price="2000">
+                    <h3>HOLO FF MAX SENJATA ONLY SS 00 AMAN</h3>
+                    <p class="price">Rp 5.000</p>
+                    <button class="add-to-cart-btn">Tambah ke Keranjang</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="shopping-cart" class="cart-section">
+            <h2>Keranjang & Pembayaran</h2>
+            <div id="cart-items">
+                <p style="text-align:center; padding: 1rem 0;">Keranjang Anda masih kosong.</p>
+            </div>
+            <div class="cart-summary">
+                <p>Total: <span id="total-price">Rp 0</span></p>
+            </div>
+             <div class="payment-section">
+                <h3>Metode Pembayaran</h3>
+                <div class="payment-methods">
+                    <div class="payment-method">
+                        <span>DANA:</span>
+                        <span id="dana-number">085822309902</span>
+                        <button class="copy-btn" data-target="dana-number"><i class="far fa-copy"></i> Salin</button>
+                    </div>
+                    <div class="payment-method">
+                        <span>OVO:</span>
+                        <span id="ovo-number">085822309902</span>
+                        <button class="copy-btn" data-target="ovo-number"><i class="far fa-copy"></i> Salin</button>
+                    </div>
+                    <div class="payment-method">
+                        <span>Gopay:</span>
+                        <span id="gopay-number">085822309902</span>
+                        <button class="copy-btn" data-target="gopay-number"><i class="far fa-copy"></i> Salin</button>
+                    </div>
+                    <div class="payment-method qris-method">
+                        <span>QRIS:</span>
+                        <img src="https://files.catbox.moe/c66pz1.png" alt="QRIS Code" id="qris-image" class="qris-img">
+                    </div>
+                </div>
+            </div>
+             <div class="upload-section">
+                <h3>Upload Bukti Transfer</h3>
+                <input type="file" id="proof-upload" accept="image/*">
+                <img id="proof-preview" src="" alt="Preview Bukti Transfer" style="display: none; max-width: 200px; margin-top: 10px;">
+            </div>
+            <div class="checkout-buttons">
+                <button id="checkout-whatsapp"><i class="fab fa-whatsapp"></i> Checkout via WhatsApp</button>
+                <button id="checkout-telegram"><i class="fab fa-telegram-plane"></i> Checkout via Telegram</button>
+            </div>
+        </section>
+    </main>
+
+    <div id="qris-modal" class="modal">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="qris-modal-img">
+    </div>
+
+    <script>
+        // === KODE JAVASCRIPT DIMULAI DI SINI ===
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Background Animation
+            const canvas = document.getElementById('background-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particlesArray;
+
+            class Particle {
+                constructor(x, y, directionX, directionY, size, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.directionX = directionX;
+                    this.directionY = directionY;
+                    this.size = size;
+                    this.color = color;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+
+                update() {
+                    if (this.x > canvas.width || this.x < 0) {
+                        this.directionX = -this.directionX;
+                    }
+                    if (this.y > canvas.height || this.y < 0) {
+                        this.directionY = -this.directionY;
+                    }
+                    this.x += this.directionX;
+                    this.y += this.directionY;
+                    this.draw();
+                }
+            }
+
+            function init() {
+                particlesArray = [];
+                let numberOfParticles = (canvas.height * canvas.width) / 9000;
+                for (let i = 0; i < numberOfParticles; i++) {
+                    let size = (Math.random() * 2) + 1;
+                    let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                    let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                    let directionX = (Math.random() * .4) - .2;
+                    let directionY = (Math.random() * .4) - .2;
+                    let color = 'rgba(37, 117, 252, 0.5)';
+                    particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+                }
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.clearRect(0, 0, innerWidth, innerHeight);
+                for (let i = 0; i < particlesArray.length; i++) {
+                    particlesArray[i].update();
+                }
+            }
+
+            init();
+            animate();
+            
+            window.addEventListener('resize', () => {
+                canvas.width = innerWidth;
+                canvas.height = innerHeight;
+                init();
+            });
+
+            // Cart Logic
+            const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+            const cartCount = document.getElementById('cart-count');
+            const cartItemsContainer = document.getElementById('cart-items');
+            const totalPriceEl = document.getElementById('total-price');
+            const cartIcon = document.querySelector('.cart-icon');
+
+            let cart = [];
+
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const card = e.target.closest('.product-card');
+                    const productId = card.dataset.id;
+                    const productName = card.dataset.name;
+                    const productPrice = parseInt(card.dataset.price);
+
+                    addToCartAnimation(card);
+                    
+                    const existingItem = cart.find(item => item.id === productId);
+
+                    if (existingItem) {
+                        existingItem.quantity++;
+                    } else {
+                        cart.push({
+                            id: productId,
+                            name: productName,
+                            price: productPrice,
+                            quantity: 1
+                        });
+                    }
+                    updateCart();
+                });
+            });
+
+            function addToCartAnimation(card) {
+                const cardClone = card.cloneNode(true);
+                const cardRect = card.getBoundingClientRect();
+                const cartRect = cartIcon.getBoundingClientRect();
+
+                cardClone.classList.add('product-card-clone');
+                cardClone.style.left = `${cardRect.left}px`;
+                cardClone.style.top = `${cardRect.top}px`;
+                cardClone.style.width = `${cardRect.width}px`;
+                cardClone.style.height = `${cardRect.height}px`;
+
+                document.body.appendChild(cardClone);
+
+                requestAnimationFrame(() => {
+                    cardClone.style.left = `${cartRect.left + (cartRect.width / 2)}px`;
+                    cardClone.style.top = `${cartRect.top + (cartRect.height / 2)}px`;
+                    cardClone.style.width = '50px';
+                    cardClone.style.height = '50px';
+                    cardClone.style.opacity = '0';
+                });
+
+                cardClone.addEventListener('transitionend', () => {
+                    cardClone.remove();
+                    cartIcon.style.transform = 'scale(1.3)';
+                    setTimeout(() => {
+                        cartIcon.style.transform = 'scale(1)';
+                    }, 200);
+                });
+            }
+
+            function updateCart() {
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = '<p style="text-align:center; padding: 1rem 0;">Keranjang Anda masih kosong.</p>';
+                } else {
+                    cartItemsContainer.innerHTML = '';
+                }
+
+                let totalCount = 0;
+                let totalPrice = 0;
+
+                cart.forEach(item => {
+                    const cartItem = document.createElement('div');
+                    cartItem.classList.add('cart-item');
+                    cartItem.innerHTML = `
+                        <div class="item-info">
+                            <span>${item.name}</span>
+                            <span class="price">Rp ${item.price.toLocaleString('id-ID')}</span>
+                        </div>
+                        <div class="item-quantity">
+                            <button class="quantity-btn" data-id="${item.id}" data-action="decrease">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="quantity-btn" data-id="${item.id}" data-action="increase">+</button>
+                        </div>
+                        <span>Rp ${(item.price * item.quantity).toLocaleString('id-ID')}</span>
+                        <button class="remove-item-btn" data-id="${item.id}"><i class="fas fa-trash"></i></button>
+                    `;
+                    cartItemsContainer.appendChild(cartItem);
+
+                    totalCount += item.quantity;
+                    totalPrice += item.price * item.quantity;
+                });
+
+                cartCount.innerText = totalCount;
+                totalPriceEl.innerText = `Rp ${totalPrice.toLocaleString('id-ID')}`;
+
+                addCartEventListeners();
+            }
+
+            function addCartEventListeners() {
+                const quantityBtns = document.querySelectorAll('.quantity-btn');
+                const removeBtns = document.querySelectorAll('.remove-item-btn');
+
+                quantityBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.dataset.id;
+                        const action = e.currentTarget.dataset.action;
+                        const item = cart.find(i => i.id === id);
+
+                        if (action === 'increase') {
+                            item.quantity++;
+                        } else if (action === 'decrease') {
+                            item.quantity--;
+                            if (item.quantity === 0) {
+                                cart = cart.filter(i => i.id !== id);
+                            }
+                        }
+                        updateCart();
+                    });
+                });
+
+                removeBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.dataset.id;
+                        cart = cart.filter(i => i.id !== id);
+                        updateCart();
+                    });
+                });
+            }
+            
+            // Copy to clipboard
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const targetId = e.currentTarget.dataset.target;
+                    const number = document.getElementById(targetId).innerText;
+
+                    navigator.clipboard.writeText(number).then(() => {
+                        e.currentTarget.innerHTML = '<i class="far fa-check-circle"></i> Tersalin';
+                        setTimeout(() => {
+                            e.currentTarget.innerHTML = '<i class="far fa-copy"></i> Salin';
+                        }, 2000);
+                    });
+                });
+            });
+
+            // QRIS Modal
+            const modal = document.getElementById("qris-modal");
+            const qrisImg = document.getElementById("qris-image");
+            const modalImg = document.getElementById("qris-modal-img");
+            const closeModal = document.querySelector(".close-modal");
+
+            qrisImg.onclick = function() {
+                modal.style.display = "flex";
+                modalImg.src = this.src;
+            }
+
+            closeModal.onclick = function() {
+                modal.style.display = "none";
+            }
+            
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+
+            // Proof Upload Preview
+            const proofUpload = document.getElementById('proof-upload');
+            const proofPreview = document.getElementById('proof-preview');
+
+            proofUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        proofPreview.src = event.target.result;
+                        proofPreview.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Checkout
+            const checkoutWhatsapp = document.getElementById('checkout-whatsapp');
+            const checkoutTelegram = document.getElementById('checkout-telegram');
+            
+            // !!! PENTING: GANTI NOMOR INI DENGAN NOMOR WHATSAPP ANDA !!!
+            const NOMOR_ADMIN_WHATSAPP = '6285822309902'; // Awali dengan 62, bukan 0
+
+            checkoutWhatsapp.addEventListener('click', () => {
+                const message = generateOrderMessage();
+                if (message) {
+                    const url = `https://api.whatsapp.com/send?phone=${NOMOR_ADMIN_WHATSAPP}&text=${encodeURIComponent(message)}`;
+                    window.open(url, '_blank');
+                }
+            });
+
+            checkoutTelegram.addEventListener('click', () => {
+                const message = generateOrderMessage();
+                if(message) {
+                    // Ganti 'username_anda' dengan username Telegram Anda
+                    const telegramUsername = "username_anda"; 
+                    alert("Pastikan Anda mengganti 'username_anda' di kode dengan username Telegram Anda.");
+                    const url = `https://t.meDira1501/${telegramUsername}?text=${encodeURIComponent(message)}`;
+                    window.open(url, '_blank');
+                }
+            });
+
+            function generateOrderMessage() {
+                if (cart.length === 0) {
+                    alert('Keranjang Anda kosong! Silakan pilih produk terlebih dahulu.');
+                    return null;
+                }
+
+                let message = 'Halo, saya ingin melakukan konfirmasi pesanan:\n\n';
+                let totalPrice = 0;
+                cart.forEach(item => {
+                    message += `• ${item.name} (x${item.quantity}) - Rp ${(item.price * item.quantity).toLocaleString('id-ID')}\n`;
+                    totalPrice += item.price * item.quantity;
+                });
+
+                message += `\n*Total Pesanan: Rp ${totalPrice.toLocaleString('id-ID')}*`;
+                
+                if (proofUpload.files.length > 0) {
+                    message += '\n\nBukti transfer sudah saya lampirkan bersamaan dengan chat ini.';
+                } else {
+                    message += '\n\nSaya akan segera melakukan pembayaran dan mengirimkan buktinya. Terima kasih!';
+                }
+
+
+                return message;
+            }
+
+        });
+        // === KODE JAVASCRIPT SELESAI ===
+    </script>
+</body>
+</html>
